@@ -23,11 +23,12 @@
 
 package com.sdicons.bus;
 
-import com.sdicons.prop.IndexedProperty;
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
 import java.beans.PropertyChangeEvent;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import com.sdicons.prop.IndexedProperty;
 
 public class IndexedPropertyTest
 {
@@ -50,27 +51,27 @@ public class IndexedPropertyTest
         prop.setValue(9, "cat");
 
         String[] lArr = prop.getValues(String.class);
-        Assert.assertEquals(lArr.length, 10);
-        Assert.assertEquals(lArr[0], null);
-        Assert.assertEquals(lArr[1], null);
-        Assert.assertEquals(lArr[2], "chicken");
-        Assert.assertEquals(lArr[3], "cow");
-        Assert.assertEquals(lArr[4], null);
-        Assert.assertEquals(lArr[5], "pig");
-        Assert.assertEquals(lArr[6], null);
-        Assert.assertEquals(lArr[7], "goat");
-        Assert.assertEquals(lArr[8], null);
-        Assert.assertEquals(lArr[9], "cat");
-        Assert.assertEquals(counter, 5);
+        Assert.assertEquals(10, lArr.length);
+        Assert.assertEquals(null, lArr[0]);
+        Assert.assertEquals(null, lArr[1]);
+        Assert.assertEquals("chicken", lArr[2]);
+        Assert.assertEquals("cow", lArr[3]);
+        Assert.assertEquals(null, lArr[4]);
+        Assert.assertEquals("pig", lArr[5]);
+        Assert.assertEquals(null, lArr[6]);
+        Assert.assertEquals("goat", lArr[7]);
+        Assert.assertEquals(null, lArr[8]);
+        Assert.assertEquals("cat", lArr[9]);
+        Assert.assertEquals(5, counter);
 
         counter = 0;
         prop.setValue(new String[]{"sheep", "dog", "chicken"});
         lArr = prop.getValues(String.class);
-        Assert.assertEquals(lArr.length, 3);
-        Assert.assertEquals(lArr[0], "sheep");
-        Assert.assertEquals(lArr[1], "dog");
-        Assert.assertEquals(lArr[2], "chicken");
-        Assert.assertEquals(counter, 6);
+        Assert.assertEquals(3, lArr.length);
+        Assert.assertEquals("sheep", lArr[0]);
+        Assert.assertEquals("dog", lArr[1]);
+        Assert.assertEquals("chicken", lArr[2]);
+        Assert.assertEquals(6, counter);
     }
 
     @Notify

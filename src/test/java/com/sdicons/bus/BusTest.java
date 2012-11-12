@@ -23,12 +23,12 @@
 
 package com.sdicons.bus;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
 import java.beans.IndexedPropertyChangeEvent;
 import java.beans.PropertyChangeEvent;
 import java.util.EventObject;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 public class BusTest
 {
@@ -43,12 +43,12 @@ public class BusTest
 
 		this.counter = 0;
 		lBus.publish(lEvent);
-		Assert.assertEquals(this.counter, 3);
+		Assert.assertEquals(3, this.counter);
 
 		lBus.unregister(this);
 		this.counter = 0;
 		lBus.publish(lEvent);
-		Assert.assertEquals(this.counter, 0);
+		Assert.assertEquals(0, this.counter);
 	}
 
 	@Notify

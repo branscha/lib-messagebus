@@ -23,10 +23,11 @@
 
 package com.sdicons.bus;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import com.sdicons.prop.ListProperty;
 import com.sdicons.prop.ListPropertyChangeEvent;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class ListPropertyTest
 {
@@ -48,13 +49,13 @@ public class ListPropertyTest
         prop.addValue("goat");
         prop.addValue("cat");
 
-        Assert.assertEquals(prop.getSize(), 5);
-        Assert.assertEquals(prop.getValue(0), "chicken");
-        Assert.assertEquals(prop.getValue(1), "cow");
-        Assert.assertEquals(prop.getValue(2), "pig");
-        Assert.assertEquals(prop.getValue(3), "goat");
-        Assert.assertEquals(prop.getValue(4), "cat");
-        Assert.assertEquals(counter, 5);
+        Assert.assertEquals(5, prop.getSize());
+        Assert.assertEquals("chicken", prop.getValue(0));
+        Assert.assertEquals("cow", prop.getValue(1));
+        Assert.assertEquals("pig", prop.getValue(2));
+        Assert.assertEquals("goat", prop.getValue(3));
+        Assert.assertEquals("cat", prop.getValue(4));
+        Assert.assertEquals(5, counter);
         
         counter = 0;
         prop.removeValue("goat");
@@ -62,11 +63,11 @@ public class ListPropertyTest
         prop.addValue(1, "rooster");
         prop.removeValue(3);
         
-        Assert.assertEquals(prop.getSize(), 3);
-        Assert.assertEquals(prop.getValue(0), "chicken");
-        Assert.assertEquals(prop.getValue(1), "rooster");
-        Assert.assertEquals(prop.getValue(2), "pig");
-        Assert.assertEquals(counter, 4);
+        Assert.assertEquals(3, prop.getSize());
+        Assert.assertEquals("chicken", prop.getValue(0));
+        Assert.assertEquals("rooster", prop.getValue(1));
+        Assert.assertEquals("pig", prop.getValue(2));
+        Assert.assertEquals(4, counter);
     }
 
     @Notify

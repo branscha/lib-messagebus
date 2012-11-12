@@ -23,15 +23,15 @@
 
 package com.sdicons.bus;
 
-import com.sdicons.prop.PropertyVetoException;
-
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+
+import com.sdicons.prop.PropertyVetoException;
 
 /**
  * <p>The message bus is an alternative mechanism for the event and event listener mechanism in JavaBeans, Swing, e.a.
@@ -139,9 +139,21 @@ public class MessageBus
 			return lSubscriber == aSubscriber;
 		}
 	}
+	
+	// Flag to see if we are publishing notifications or not
+	private boolean isPublishing = false;
 
 	// The list containing the observers.
-	private List<SubscriberInfo> subscriberInfos = new LinkedList<SubscriberInfo>();
+	private List<SubscriberInfo> subscriberInfos = new ArrayList<SubscriberInfo>();
+	
+	// List of delayed additions.
+	private List<SubscriberInfo> subscriberCandidates = new ArrayList<SubscriberInfo>();
+	
+	// List of delayed deletions.
+    private List<SubscriberInfo> subscriberDeathrow = new ArrayList<SubscriberInfo>();
+    
+    // Delayed events.
+    private List<EventObject> delayedEvents = new ArrayList<EventObject>();
 	
 	// The parent bus.
 	private MessageBus parentBus;
@@ -183,12 +195,14 @@ public class MessageBus
 			final Notify lAnnot = lMethod.getAnnotation(Notify.class);
 			if (lAnnot != null)
 			{
-				final Class lParamTypes[] = lMethod.getParameterTypes();
+				final Class<?> lParamTypes[] = lMethod.getParameterTypes();
 				if (lParamTypes.length == 1)
 				{
 					if (EventObject.class.isAssignableFrom(lParamTypes[0]))
 					{
-						this.subscriberInfos.add(new SubscriberInfo(aSubscriber, lMethod, lParamTypes[0], lAnnot.sourceType(), lAnnot.allowNullSource()));
+					    SubscriberInfo subscriber = new SubscriberInfo(aSubscriber, lMethod, lParamTypes[0], lAnnot.sourceType(), lAnnot.allowNullSource());
+					    if(isPublishing) this.subscriberCandidates.add(subscriber);
+					    else this.subscriberInfos.add(subscriber);
 					}
 					else
 					{
@@ -222,11 +236,22 @@ public class MessageBus
 			final SubscriberInfo lInfo = lIter.next();
 			if (lInfo.isGarbage() || lInfo.isForSpecifiedSubscriber(aSubscriber))
 			{
-				lIter.remove();
+			    if(isPublishing) this.subscriberDeathrow.add(lInfo);
+			    else lIter.remove();
 			}
+		}
+		
+		// Also delete from the candidate list.
+		final Iterator<SubscriberInfo> lIterBis = this.subscriberCandidates.iterator();
+		while(lIterBis.hasNext())
+		{
+		    final SubscriberInfo candidate = lIterBis.next();
+		    if(candidate.isForSpecifiedSubscriber(aSubscriber))
+		        lIterBis.remove();
 		}
 	}
 
+	
 	/**
 	 * <p>Publish an event on the message bus. All {@link #register(Object) registered} handlers that are interested in this
 	 * event will be called.
@@ -238,26 +263,65 @@ public class MessageBus
 	 */
 	public void publish(EventObject aEvent)
 	{
-		boolean lHandled = false;
-		final Iterator<SubscriberInfo> lIter = this.subscriberInfos.iterator();
-		while (lIter.hasNext())
-		{
-			final SubscriberInfo lInfo = lIter.next();
-			if (lInfo.isGarbage())
-			{
-				lIter.remove();
-			}
-			else if (!lHandled)
-			{
-				lHandled = lInfo.notify(aEvent);
-			}
-		}
-
-		// Ripple the event to the parent.
-		if (!lHandled && (this.parentBus != null))
-		{
-			this.parentBus.publish(aEvent);
-		}
+	    if(isPublishing) 
+	    {
+	        delayedEvents.add(aEvent);
+	        return;
+	    }
+	    
+	    try 
+	    {
+	        isPublishing = true;
+    		boolean lHandled = false;
+    		final Iterator<SubscriberInfo> lIter = this.subscriberInfos.iterator();
+    		while (lIter.hasNext())
+    		{
+    			final SubscriberInfo lInfo = lIter.next();
+    			if (lInfo.isGarbage())
+    			{
+    				lIter.remove();
+    			}
+    			else if (!lHandled)
+    			{
+    				lHandled = lInfo.notify(aEvent);
+    			}
+    		}
+    
+    		// Ripple the event to the parent.
+    		if (!lHandled && (this.parentBus != null))
+    		{
+    			this.parentBus.publish(aEvent);
+    		}
+	    }
+	    finally 
+	    {
+	        // Delayed adding.
+	        //
+	        if(subscriberCandidates.size() > 0) 
+	        {
+	            subscriberInfos.addAll(subscriberCandidates);
+	            subscriberCandidates.clear();
+	        }
+	        
+	        // Delayed removal.
+	        //
+	        if(subscriberDeathrow.size () > 0) 
+	        {
+	            subscriberInfos.removeAll(subscriberDeathrow);
+	            subscriberDeathrow.clear();
+	        }
+	        
+	        // Reset the flag.
+	        isPublishing = false;
+	    }
+	    
+	    // Handle delayed events that were published
+	    // in event handlers.
+	    while(delayedEvents.size() > 0) 
+	    {
+	        this.publish(delayedEvents.get(0));
+	        delayedEvents.remove(0);
+	    }
 	}
 
 	// Remove all handler information concerning garbage collected listeners

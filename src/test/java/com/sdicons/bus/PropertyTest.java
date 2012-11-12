@@ -23,13 +23,14 @@
 
 package com.sdicons.bus;
 
+import java.beans.PropertyChangeEvent;
+
+import org.junit.Assert;
+import org.junit.Test;
+
 import com.sdicons.prop.Property;
 import com.sdicons.prop.PropertyVetoException;
 import com.sdicons.prop.VetoablePropertyChangeEvent;
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
-import java.beans.PropertyChangeEvent;
 
 public class PropertyTest
 {
@@ -57,8 +58,8 @@ public class PropertyTest
         Assert.assertTrue(prop.getValue() >= 0);
 
         prop.setValue(101);
-        Assert.assertEquals(prop.getValue(), new Integer(101));
-        Assert.assertEquals(counter, 1);
+        Assert.assertEquals( new Integer(101), prop.getValue());
+        Assert.assertEquals(1, counter);
     }
 
     @Notify

@@ -23,12 +23,12 @@
 
 package com.sdicons.bus;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
 import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 public class MemoryTest
 {
@@ -61,8 +61,8 @@ public class MemoryTest
 
         // Try out the working of the listeners.
         lBus.publish(new EventObject(this));
-        Assert.assertEquals(lBus.getNrSubscribers(), NR_LISTENERS);
-        Assert.assertEquals(Listener.counter, NR_LISTENERS);
+        Assert.assertEquals(NR_LISTENERS, lBus.getNrSubscribers());
+        Assert.assertEquals(NR_LISTENERS, Listener.counter);
 
         // By clearing the cache, we allow the listeners to be
         // garbage collected.

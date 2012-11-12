@@ -23,12 +23,13 @@
 
 package com.sdicons.bus;
 
-import com.sdicons.prop.ClientProperties;
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
-import java.awt.*;
+import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import com.sdicons.prop.ClientProperties;
 
 public class ClientPropertiesTest
 {
@@ -47,11 +48,11 @@ public class ClientPropertiesTest
         props.setValue("boele", 5);
         props.setValue("makkis", new Rectangle(5, 3));
 
-        Assert.assertEquals(props.getValue("oele"), "zebra");
-        Assert.assertEquals(props.getValue("boele"), 5);
-        Assert.assertEquals(props.getValue("makkis"), new Rectangle(5, 3));
-        Assert.assertEquals(props.getValue("voele"), null);
-        Assert.assertEquals(counter, 3);
+        Assert.assertEquals("zebra", props.getValue("oele"));
+        Assert.assertEquals(5, props.getValue("boele"));
+        Assert.assertEquals( new Rectangle(5, 3), props.getValue("makkis"));
+        Assert.assertEquals(null, props.getValue("voele"));
+        Assert.assertEquals(3, counter);
     }
 
     @Notify

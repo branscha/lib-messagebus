@@ -1,0 +1,26 @@
+# Rename it to .gitignore and 
+# copy it in your Git repository.
+
+# Maven artifacts.
+#
+target/
+test-output/
+
+# IDEA IntelliJ.
+#
+.idea/
+*.iml
+
+# Eclipse.
+#
+.classpath
+.project
+.settings/
+
+# Java stuff.
+*.class
+
+# Other
+*.log
+Thumbs.db
+.DS_Store
