@@ -23,6 +23,7 @@
 
 package com.sdicons.bus;
 
+import java.beans.PropertyChangeEvent;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -72,14 +73,17 @@ public class MessageBus
 		private Class<?> sourceType;
 		// Does the handler accept messages with unknown message source?
 		private boolean allowNullSource;
+		// Is the handler related to a property?
+		private String propertyName;
 		
-		private SubscriberInfo(Object aSubscriber, Method aMethod, Class<?> aParameterType, Class<?> aSourceType, boolean aAllowNullSource)
+		private SubscriberInfo(Object aSubscriber, Method aMethod, Class<?> aParameterType, Class<?> aSourceType, boolean aAllowNullSource, String aPropName)
 		{
 			this.subscriberRef = new WeakReference<Object>(aSubscriber);
 			this.method = aMethod;
 			this.parameterType = aParameterType;
 			this.sourceType = aSourceType;
 			this.allowNullSource = aAllowNullSource;
+			this.propertyName = aPropName;
 		}
 
 		// Conditionally call a handler with the specified event.
@@ -94,17 +98,23 @@ public class MessageBus
 				{
 					if (this.parameterType.isAssignableFrom(aEvent.getClass()))
 					{
-						Object lSource = aEvent.getSource();
-						if (((lSource == null) && this.allowNullSource) || 
-							((lSource != null) && this.sourceType.isAssignableFrom(lSource.getClass())))
-						{
-							// Invoke the notification method and remember the result.
-							final Object lResult = this.method.invoke(lSubscriber, aEvent);
-							// If the notification method gave us a boolean, we will interpret this value,
-							// if we got 'true' this means that the event was handled completely, no other handlers will be invoked.
-							// If we got a 'false' this means that we have to continue invoking the other handlers.
-							return (lResult instanceof Boolean) && (Boolean)lResult;
-						}
+						//
+						Object eventSource = aEvent.getSource();
+						//
+						String eventProp;
+						if(aEvent instanceof PropertyChangeEvent) eventProp = ((PropertyChangeEvent) aEvent).getPropertyName(); 
+						else eventProp = "";
+						//
+						if(eventSource == null && !this.allowNullSource) return false;
+						else if ((eventSource != null) && !this.sourceType.isAssignableFrom(eventSource.getClass())) return false;
+						else if (this.propertyName != null && !"".equals(this.propertyName) && !eventProp.equals(this.propertyName)) return false;
+							
+						// Invoke the notification method and remember the result.
+						final Object lResult = this.method.invoke(lSubscriber, aEvent);
+						// If the notification method gave us a boolean, we will interpret this value,
+						// if we got 'true' this means that the event was handled completely, no other handlers will be invoked.
+						// If we got a 'false' this means that we have to continue invoking the other handlers.
+						return (lResult instanceof Boolean) && (Boolean)lResult;
 					}
 				}
 				catch (InvocationTargetException e)
@@ -202,7 +212,7 @@ public class MessageBus
 				{
 					if (EventObject.class.isAssignableFrom(lParamTypes[0]))
 					{
-					    SubscriberInfo subscriber = new SubscriberInfo(aSubscriber, lMethod, lParamTypes[0], lAnnot.sourceType(), lAnnot.allowNullSource());
+					    SubscriberInfo subscriber = new SubscriberInfo(aSubscriber, lMethod, lParamTypes[0], lAnnot.sourceType(), lAnnot.allowNullSource(), lAnnot.propertyName());
 					    if(isPublishing) this.subscriberCandidates.add(subscriber);
 					    else this.subscriberInfos.add(subscriber);
 					}
@@ -297,7 +307,7 @@ public class MessageBus
 	    }
 	    finally 
 	    {
-	        // Delayed adding.
+	        // Delayed listener addition.
 	        //
 	        if(subscriberCandidates.size() > 0) 
 	        {
@@ -305,7 +315,7 @@ public class MessageBus
 	            subscriberCandidates.clear();
 	        }
 	        
-	        // Delayed removal.
+	        // Delayed listener removal.
 	        //
 	        if(subscriberDeathrow.size () > 0) 
 	        {

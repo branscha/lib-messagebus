@@ -26,21 +26,24 @@ package com.sdicons.bus;
 import java.beans.PropertyChangeEvent;
 import java.util.EventObject;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 public class NestedRegistrationTest
 {
-    private static class SecondListner 
+    private class SecondListner 
     {
         @Notify
         @SuppressWarnings("unused")
         public void callback(EventObject aEvent) 
         {
-            System.out.println("Ai");
+            counter++;
         }
     }
     
     private MessageBus bus;
+    private int counter = 0;
     
 	@Test
 	public void Oele()
@@ -49,7 +52,12 @@ public class NestedRegistrationTest
 		bus.register(this);
 		
 		PropertyChangeEvent lEvent = new PropertyChangeEvent(this, "oele", 0, 1);
+		// Fist call will get the second handler registered.
 		bus.publish(lEvent);
+		// Second call will bump the counter.
+		bus.publish(lEvent);
+		//
+		Assert.assertEquals(1, counter);
 	}
 
 	@Notify

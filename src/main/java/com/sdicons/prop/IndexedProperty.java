@@ -122,7 +122,7 @@ implements Serializable
 	}
 
 	@SuppressWarnings("unchecked")
-	public E[] getValues(Class aType)
+	public E[] getValues(Class<E> aType)
 	{
 		// Find the maximum index.
 		int max = -1;

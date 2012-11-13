@@ -48,12 +48,12 @@ implements Iterable<E>, Serializable
 	private boolean constrained;
 
     private class IteratorWrapper
-    implements Iterator
+    implements Iterator<E>
     {
-        private Iterator target;
-        private Object lastSeen;
+        private Iterator<E> target;
+        private E lastSeen;
 
-        private IteratorWrapper(Iterator aTarget)
+        private IteratorWrapper(Iterator<E> aTarget)
         {
             target = aTarget;
         }
@@ -63,7 +63,7 @@ implements Iterable<E>, Serializable
             return target.hasNext();
         }
 
-        public Object next()
+        public E next()
         {
             lastSeen = target.next();
             return lastSeen;
@@ -238,8 +238,7 @@ implements Iterable<E>, Serializable
 		return values.lastIndexOf(aValue);
 	}
 
-    @SuppressWarnings("unchecked")
-	 public Iterator iterator()
+	public Iterator<E> iterator()
     {
         return new IteratorWrapper(values.iterator());
     }

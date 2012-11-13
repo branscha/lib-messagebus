@@ -55,4 +55,5 @@ public @interface Notify
 {
     Class<?> sourceType() default Object.class;
     boolean allowNullSource() default true;
+    String propertyName() default "";
 }

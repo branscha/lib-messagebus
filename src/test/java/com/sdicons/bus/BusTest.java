@@ -43,7 +43,7 @@ public class BusTest
 
 		this.counter = 0;
 		lBus.publish(lEvent);
-		Assert.assertEquals(3, this.counter);
+		Assert.assertEquals(4, this.counter);
 
 		lBus.unregister(this);
 		this.counter = 0;
@@ -78,6 +78,7 @@ public class BusTest
 		// Should NOT be called.
 		// The source type is not compatible, the event can never be thrown from a String instance.
 		this.counter++;
+		Assert.fail();
 	}
 
 	@Notify
@@ -86,5 +87,23 @@ public class BusTest
 		// Should NOT be called.
 		// The test event is a PropertyChangeEvent and not the Indexed variant.
 		this.counter++;
+		Assert.fail();
+	}
+	
+	@Notify(propertyName="oele")
+	public void callback5(EventObject aEvent)
+	{
+		// Should be called.
+		this.counter++;
+	}
+	
+	@Notify(propertyName="xxxx")
+	public void callback6(EventObject aEvent)
+	{
+		// Should NOT be called.
+		// The name of the property was specified and it does not correspond 
+		// with the property name in the event.
+		this.counter++;
+		Assert.fail();
 	}
 }
