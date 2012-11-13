@@ -29,6 +29,7 @@ import java.beans.IndexedPropertyChangeEvent;
 import java.beans.PropertyChangeEvent;
 import java.io.Serializable;
 import java.lang.reflect.Array;
+import java.nio.channels.AsynchronousSocketChannel;
 import java.util.*;
 
 /**
@@ -57,6 +58,11 @@ implements Serializable
 		this.values = new HashMap<Integer, E>();
 		this.constrained = aConstrained;
 	}
+	
+	public IndexedProperty(String aName, boolean aConstrained, Object aSource)
+    {
+       this(aName, aConstrained, aSource, MessageBus.getDefault());
+    }
 
 	public void setBus(MessageBus aBus)
 	{

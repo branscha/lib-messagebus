@@ -63,6 +63,11 @@ implements Serializable
         value = aValue;
         constrained = aConstrained;
     }
+    
+    public Property(String aName, boolean aConstrained, Object aSource, E aValue)
+    {
+        this(aName, aConstrained, aSource, MessageBus.getDefault(), aValue);
+    }
 
     public void setBus(MessageBus aBus)
     {

@@ -98,6 +98,11 @@ implements Iterable<E>, Serializable
 		this.constrained = aConstrained;		
 	}
 	
+	public ListProperty(String aName, boolean aConstrained, Object aSource)
+    {
+        this(aName, aConstrained, aSource, MessageBus.getDefault());    
+    }
+	
 	public ListProperty(String aName, boolean aConstrained, Object aSource, MessageBus aBus, List<E> aImpl)
 	{
 		this.name = aName;
@@ -106,6 +111,11 @@ implements Iterable<E>, Serializable
 		this.values = aImpl;
 		this.constrained = aConstrained;		
 	}
+	
+	public ListProperty(String aName, boolean aConstrained, Object aSource, List<E> aImpl)
+    {
+        this(aName, aConstrained, aSource, MessageBus.getDefault(), aImpl);     
+    }
 
 	public void setBus(MessageBus aBus)
 	{

@@ -59,6 +59,12 @@ import com.sdicons.prop.PropertyVetoException;
  */
 public class MessageBus
 {
+    private static final MessageBus defaultBus = new MessageBus();
+    public static MessageBus getDefault() 
+    {
+        return defaultBus;
+    }
+    
 	// Data structure to keep track of a bus listener.
 	private static class SubscriberInfo
 	{

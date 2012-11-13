@@ -50,6 +50,11 @@ implements Serializable
         values = new HashMap<Object, Object>();
         constrained = aConstrained;
     }
+    
+    public ClientProperties(boolean aConstrained, Object aSource)
+    {
+        this(aConstrained, aSource, MessageBus.getDefault());
+    }
 
     public void setBus(MessageBus aBus)
     {

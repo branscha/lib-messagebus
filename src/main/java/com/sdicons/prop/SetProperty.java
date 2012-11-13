@@ -92,6 +92,11 @@ implements Iterable<E>, Serializable
 		this.values = new HashSet<E>();
 		this.constrained = aConstrained;
 	}
+	
+	public SetProperty(String aName, boolean aConstrained, Object aSource)
+    {
+        this(aName, aConstrained, aSource, MessageBus.getDefault());
+    }
 
 	public SetProperty(String aName, boolean aConstrained, Object aSource, MessageBus aBus, Set<E> aImpl)
 	{
@@ -101,6 +106,11 @@ implements Iterable<E>, Serializable
 		this.values = aImpl;
 		this.constrained = aConstrained;		
 	}
+	
+	public SetProperty(String aName, boolean aConstrained, Object aSource, Set<E> aImpl)
+    {
+        this(aName, aConstrained, aSource, MessageBus.getDefault(), aImpl);       
+    }
 
 	public void setBus(MessageBus aBus)
 	{
