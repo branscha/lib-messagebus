@@ -26,7 +26,9 @@ package com.sdicons.bus;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.EventObject;
 import java.util.Iterator;
 import java.util.List;
@@ -153,7 +155,7 @@ public class MessageBus
     private List<SubscriberInfo> subscriberDeathrow = new ArrayList<SubscriberInfo>();
     
     // Delayed events.
-    private List<EventObject> delayedEvents = new ArrayList<EventObject>();
+    private Deque<EventObject> delayedEvents = new ArrayDeque<EventObject>();
 	
 	// The parent bus.
 	private MessageBus parentBus;
@@ -265,7 +267,7 @@ public class MessageBus
 	{
 	    if(isPublishing) 
 	    {
-	        delayedEvents.add(aEvent);
+	        delayedEvents.offer(aEvent);
 	        return;
 	    }
 	    
@@ -319,8 +321,7 @@ public class MessageBus
 	    // in event handlers.
 	    while(delayedEvents.size() > 0) 
 	    {
-	        this.publish(delayedEvents.get(0));
-	        delayedEvents.remove(0);
+	        this.publish(delayedEvents.poll());
 	    }
 	}
 
