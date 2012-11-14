@@ -100,7 +100,7 @@ implements Iterable<E>, Serializable
 	
 	public ListProperty(String aName, boolean aConstrained, Object aSource)
     {
-        this(aName, aConstrained, aSource, MessageBus.getDefault());    
+        this(aName, aConstrained, aSource, MessageBus.getDefaultMessageBus());    
     }
 	
 	public ListProperty(String aName, boolean aConstrained, Object aSource, MessageBus aBus, List<E> aImpl)
@@ -114,7 +114,7 @@ implements Iterable<E>, Serializable
 	
 	public ListProperty(String aName, boolean aConstrained, Object aSource, List<E> aImpl)
     {
-        this(aName, aConstrained, aSource, MessageBus.getDefault(), aImpl);     
+        this(aName, aConstrained, aSource, MessageBus.getDefaultMessageBus(), aImpl);     
     }
 
 	public void setBus(MessageBus aBus)

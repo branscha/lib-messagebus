@@ -66,7 +66,7 @@ implements Serializable
     
     public Property(String aName, boolean aConstrained, Object aSource, E aValue)
     {
-        this(aName, aConstrained, aSource, MessageBus.getDefault(), aValue);
+        this(aName, aConstrained, aSource, MessageBus.getDefaultMessageBus(), aValue);
     }
 
     public void setBus(MessageBus aBus)

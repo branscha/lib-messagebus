@@ -29,10 +29,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.EventObject;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.sdicons.prop.PropertyVetoException;
 
@@ -59,10 +62,75 @@ import com.sdicons.prop.PropertyVetoException;
  */
 public class MessageBus
 {
-    private static final MessageBus defaultBus = new MessageBus();
-    public static MessageBus getDefault() 
+    private static final MessageBus defaultBus = new MessageBus("default");
+    
+    /**
+     * Get the default global message bus.
+     * 
+     * @return the global message bus.
+     */
+    public static MessageBus getDefaultMessageBus() 
     {
         return defaultBus;
+    }
+    
+    private static final Map<String, MessageBus> infrastructure = new HashMap<String, MessageBus>();
+    
+    /**
+     * Build a message bus system using a name of the form 'bus1.bus2.bus3'. This will build a number of hierarchically organized
+     * busses. The system keeps track of the busses, requested the same bus twice will give you exactly the same bus as before.
+     * All busses will have the default global message bus as its parent.
+     * 
+     * @param busName The name of the message bus to create. 
+     * @return The requested message bus.
+     */
+    public static MessageBus getMessageBus(String busName)
+    {
+    	// Return the default bus if there is something wrong with the path.
+    	//
+    	if(busName == null || "".equals(busName.trim())) return getDefaultMessageBus();
+    	
+    	if(infrastructure.containsKey(busName)) 
+		{
+    		// The fast lane.
+    		//
+    		return infrastructure.get(busName);
+		}
+    	else
+    	{
+    		String[] parts = busName.split("\\.");
+    		List<String> partList = Arrays.asList(parts);
+    		
+	    	if(partList.size() == 1) 
+	    	{
+	    		MessageBus bus = new MessageBus(partList.get(0), getDefaultMessageBus());
+	    		infrastructure.put(partList.get(0), bus);
+	    		return bus;
+	    	} 
+	    	else
+	    	{
+	    		// Build the name of parent.
+	    		StringBuilder parentNameBuilder = new StringBuilder();
+	    		for(int i = 0; i < partList.size() - 1; i++) 
+	    		{
+	    			parentNameBuilder.append(partList.get(i));
+	    			if(i < (partList.size() - 2)) parentNameBuilder.append(".");
+	    		}
+	    		String parentName = parentNameBuilder.toString();
+	    		
+	    		// Create parent bus.
+	    		MessageBus parentBus = getMessageBus(parentName);
+	    		
+	    		// Build the bus using the parent bus.
+	    		StringBuilder nameBuilder = new StringBuilder();
+	    		nameBuilder.append(parentName).append('.').append(partList.get(partList.size()-1));
+	    		String name = nameBuilder.toString();
+	    		//
+	    		MessageBus bus = new MessageBus(name, parentBus);
+	    		infrastructure.put(name, bus);
+	    		return bus;
+	    	}
+    	}
     }
     
 	// Data structure to keep track of a bus listener.
@@ -158,7 +226,7 @@ public class MessageBus
 		}
 	}
 	
-	// Flag to see if we are publishing notifications or not
+	// Flag to see if we are publishing notifications or not.
 	private boolean isPublishing = false;
 
 	// The list containing the observers.
@@ -175,6 +243,9 @@ public class MessageBus
 	
 	// The parent bus.
 	private MessageBus parentBus;
+	
+	// Some identifier.
+	private String name = "Anonymous Bus";
 
 	/**
 	 * Construct a message bus that is connected to a parent bus. Messages will be sent to the parent
@@ -188,13 +259,24 @@ public class MessageBus
 	{
 		this.parentBus = aParent;
 	}
+	
+	public MessageBus(String name, MessageBus parent)
+	{
+		this.parentBus = parent;
+		this.name = name;
+	}
 
 	/**
 	 * Create a message bus.
 	 */
 	public MessageBus()
 	{
-		this(null);
+		this((MessageBus) null);
+	}
+	
+	public MessageBus(String name)
+	{
+		this(name, null);
 	}
 
 	/**
@@ -367,4 +449,9 @@ public class MessageBus
     {
         return subscriberInfos.size();
     }
+
+	public String getName() 
+	{
+		return name;
+	}
 }

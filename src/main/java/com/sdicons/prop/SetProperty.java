@@ -95,7 +95,7 @@ implements Iterable<E>, Serializable
 	
 	public SetProperty(String aName, boolean aConstrained, Object aSource)
     {
-        this(aName, aConstrained, aSource, MessageBus.getDefault());
+        this(aName, aConstrained, aSource, MessageBus.getDefaultMessageBus());
     }
 
 	public SetProperty(String aName, boolean aConstrained, Object aSource, MessageBus aBus, Set<E> aImpl)
@@ -109,7 +109,7 @@ implements Iterable<E>, Serializable
 	
 	public SetProperty(String aName, boolean aConstrained, Object aSource, Set<E> aImpl)
     {
-        this(aName, aConstrained, aSource, MessageBus.getDefault(), aImpl);       
+        this(aName, aConstrained, aSource, MessageBus.getDefaultMessageBus(), aImpl);       
     }
 
 	public void setBus(MessageBus aBus)

@@ -53,7 +53,7 @@ implements Serializable
     
     public ClientProperties(boolean aConstrained, Object aSource)
     {
-        this(aConstrained, aSource, MessageBus.getDefault());
+        this(aConstrained, aSource, MessageBus.getDefaultMessageBus());
     }
 
     public void setBus(MessageBus aBus)

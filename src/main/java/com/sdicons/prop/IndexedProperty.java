@@ -23,14 +23,17 @@
 
 package com.sdicons.prop;
 
-import com.sdicons.bus.MessageBus;
-
 import java.beans.IndexedPropertyChangeEvent;
 import java.beans.PropertyChangeEvent;
 import java.io.Serializable;
 import java.lang.reflect.Array;
-import java.nio.channels.AsynchronousSocketChannel;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import com.sdicons.bus.MessageBus;
 
 /**
  * Implementation support for indexed properties.
@@ -61,7 +64,7 @@ implements Serializable
 	
 	public IndexedProperty(String aName, boolean aConstrained, Object aSource)
     {
-       this(aName, aConstrained, aSource, MessageBus.getDefault());
+       this(aName, aConstrained, aSource, MessageBus.getDefaultMessageBus());
     }
 
 	public void setBus(MessageBus aBus)
